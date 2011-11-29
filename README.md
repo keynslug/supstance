@@ -19,7 +19,7 @@ Building and configuring
 In order to build a project you should execute something like that:
 ```
 git clone git://github.com/keynslug/supstance.git
-cd deep
+cd supstance
 make compile
 ```
 

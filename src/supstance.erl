@@ -20,12 +20,18 @@
 
 -define(DEFAULT_TIMEOUT, 5000).
 
+%% @doc Equivalent to `childspec(permanent, Specification, RegistrationType, Options)'.
+%% @see childspec/4
+
 -spec permanent(Specification, RegistrationType, Options) -> supervisor:child_spec() when
     Specification    :: atom() | {term(), atom()} | {term(), atom(), atom()},
     RegistrationType :: none | local | global,
     Options          :: inherit | global | term().
 
 permanent(Spec, RegType, Options) -> childspec(permanent, Spec, RegType, Options).
+
+%% @doc Equivalent to `childspec(transient, Specification, RegistrationType, Options)'.
+%% @see childspec/4
 
 -spec transient(Specification, RegistrationType, Options) -> supervisor:child_spec() when
     Specification    :: atom() | {term(), atom()} | {term(), atom(), atom()},
@@ -34,6 +40,9 @@ permanent(Spec, RegType, Options) -> childspec(permanent, Spec, RegType, Options
 
 transient(Spec, RegType, Options) -> childspec(transient, Spec, RegType, Options).
 
+%% @doc Equivalent to `childspec(temporary, Specification, RegistrationType, Options)'.
+%% @see childspec/4
+
 -spec temporary(Specification, RegistrationType, Options) -> supervisor:child_spec() when
     Specification    :: atom() | {term(), atom()} | {term(), atom(), atom()},
     RegistrationType :: none | local | global,
@@ -41,12 +50,47 @@ transient(Spec, RegType, Options) -> childspec(transient, Spec, RegType, Options
 
 temporary(Spec, RegType, Options) -> childspec(temporary, Spec, RegType, Options).
 
+%% @doc Equivalent to `childspec(supervisor, Specification, RegistrationType, Options)'.
+%% @see childspec/4
+
 -spec supervisor(Specification, RegistrationType, Options) -> supervisor:child_spec() when
     Specification    :: atom() | {term(), atom()} | {term(), atom(), atom()},
     RegistrationType :: none | local | global,
     Options          :: inherit | global | term().
 
 supervisor(Spec, RegType, Options) -> childspec(supervisor, Spec, RegType, Options).
+
+%% @doc Creates and prevalidates child specification to be fed into supervisor.
+%%
+%% The `Role' denotes child lifetime, designation and importance. They are briefly correspond
+%% with ones described in `supervisor' documentation. The rule of thumb is as follows:
+%% <ll>
+%% <li>if you want longterm service which should live all the time around then `permanent' is your choice.</li>
+%% <li>if you want process to take out some work and surely complete it in the right way then `transient' is your choice.</li>
+%% <li>if you want process to fulfill some work with no guarantee of completion then `temporary' is your choice.</li>
+%% <li>and if you are nesting another supervisor then `supervisor' is your choice.</li>
+%% </ll>
+%%
+%% The `Specification' tells what to start actually. If it is single atom `Module' then childspec named `Module' will
+%% start process calling `Module:start_link'. If it is `{Name, Module}' then childspec with name `Name' will start a 
+%% process through `Module:start_link'. And finally if one is {Name, Module, Entry}' then childspec with name `Name' again
+%% will start a process by a call to `Module:Entry'.
+%%
+%% The `RegistrationType' points how to register child process. Local processes visible on the node where they has been 
+%% started. Global processes on the other hand visible on the every node connected to the one where they has been started.
+%% You may pass `none' denoting no registration is required. The last one is the case for self-contained  processes 
+%% and services usually.
+%% 
+%% If `RegistrationType' is `local' or `global' then `Module' entry point (usually `start_link') should take two arguments:
+%% `Name', `Options'. Otherwise is should be freely fed with only `Options' argument.
+%%
+%% Through `Options' you may pass `global', `inherit' or arbitrary term which shall fall through into module entry point
+%% with no additional processing. In the case you pass `global' then all environment variables corresponding to the calling
+%% application in the form of property list will fall into module entry point. In the case you pass `inherit' there then
+%% only subset of environment variables corresponding to the name of a child shall fall through that way.
+%% 
+%% This is done through calls to `options/1' actually.
+%% @see options/1
 
 -spec childspec(Role, Specification, RegistrationType, Options) -> supervisor:child_spec() when
     Role             :: permanent | transient | temporary | supervisor,
@@ -90,6 +134,17 @@ restart_mode(Mode) -> Mode.
 kill_mode(supervisor) -> infinity;
 kill_mode(temporary) -> brutal_kill;
 kill_mode(_) -> ?DEFAULT_TIMEOUT.
+
+%% @doc Retrieves a set of options based on application environment variables.
+%%
+%% If `Whose' is `global' whole set of application environment variables is
+%% returned assuming it is valid property list.
+%%
+%% If `Whose' is `{inherit, Name}' a subset of application environment variables is
+%% returned. Assuming last one is valid property list the value of the property under
+%% `Name' returned. If such property is not defined empty list returned.
+%%
+%% These routines are intentionally used by `supstance' itself.
 
 -spec options(Whose) -> proplists:proplist() when
     Whose :: {inherit, atom()} | global.
