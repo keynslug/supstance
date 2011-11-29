@@ -1,0 +1,14 @@
+{application, supstance, [
+
+    {description, "Simplified supervisor child specifications"},
+    {vsn, "0.1"},
+    {registered, []},
+    {env, []},
+
+    {applications, [
+        kernel,
+        stdlib
+    ]}
+
+]}.
+
