@@ -1,5 +1,7 @@
 Supstance
 =========
+@ http://keynslug.github.com/supstance
+
 A set of convinient routines which simplify child specifications generation and prevalidation.
 
 Overview
