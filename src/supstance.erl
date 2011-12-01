@@ -150,7 +150,7 @@ kill_mode(_) -> ?DEFAULT_TIMEOUT.
     Whose :: {inherit, atom()} | global.
 
 options({inherit, Name}) ->
-    deep_props:get(Name, options(global), []);
+    deepprops:get(Name, options(global), []);
 
 options(global) ->
     application:get_all_env().
@@ -195,7 +195,7 @@ validate_entry(_, _, _) ->
 %% @private
 validate_export(Module, Entry, Reg) ->
     Info = Module:module_info(),
-    case deep_props:extract([exports, Entry], Info, no_export) of
+    case deepprops:extract([exports, Entry], Info, no_export) of
         {no_export, _} -> 
             throw(no_export);
         {Arities, _} when is_list(Arities) -> 
