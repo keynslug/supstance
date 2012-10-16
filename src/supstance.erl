@@ -184,7 +184,6 @@ validate_entry(Module, Entry, Reg) when is_atom(Module), is_atom(Entry) ->
     case code:ensure_loaded(Module) of
         {module, Module}          -> ok;
         {error, embedded}         -> ok;
-        {error, sticky_directory} -> ok;
         {error, Error}            -> throw({loading_failed, Error})
     end,
     ok = validate_export(Module, Entry, Reg);
