@@ -15,7 +15,7 @@
     supervisor/3,
 
     options/1
-    
+
 ]).
 
 -define(DEFAULT_TIMEOUT, 5000).
@@ -72,15 +72,15 @@ supervisor(Spec, RegType, Options) -> childspec(supervisor, Spec, RegType, Optio
 %% </ll>
 %%
 %% The `Specification' tells what to start actually. If it is single atom `Module' then childspec named `Module' will
-%% start process calling `Module:start_link'. If it is `{Name, Module}' then childspec with name `Name' will start a 
+%% start process calling `Module:start_link'. If it is `{Name, Module}' then childspec with name `Name' will start a
 %% process through `Module:start_link'. And finally if one is {Name, Module, Entry}' then childspec with name `Name' again
 %% will start a process by a call to `Module:Entry'.
 %%
-%% The `RegistrationType' points how to register child process. Local processes visible on the node where they has been 
+%% The `RegistrationType' points how to register child process. Local processes visible on the node where they has been
 %% started. Global processes on the other hand visible on the every node connected to the one where they has been started.
-%% You may pass `none' denoting no registration is required. The last one is the case for self-contained  processes 
+%% You may pass `none' denoting no registration is required. The last one is the case for self-contained  processes
 %% and services usually.
-%% 
+%%
 %% If `RegistrationType' is `local' or `global' then `Module' entry point (usually `start_link') should take two arguments:
 %% `Name', `Options'. Otherwise is should be freely fed with only `Options' argument.
 %%
@@ -88,7 +88,7 @@ supervisor(Spec, RegType, Options) -> childspec(supervisor, Spec, RegType, Optio
 %% with no additional processing. In the case you pass `global' then all environment variables corresponding to the calling
 %% application in the form of property list will fall into module entry point. In the case you pass `inherit' there then
 %% only subset of environment variables corresponding to the name of a child shall fall through that way.
-%% 
+%%
 %% This is done through calls to `options/1' actually.
 %% @see options/1
 
@@ -188,22 +188,22 @@ validate_entry(Module, Entry, Reg) when is_atom(Module), is_atom(Entry) ->
     end,
     ok = validate_export(Module, Entry, Reg);
 
-validate_entry(_, _, _) -> 
+validate_entry(_, _, _) ->
     throw(invalid_name).
 
 %% @private
 validate_export(Module, Entry, Reg) ->
     Info = Module:module_info(),
     case deepprops:extract([exports, Entry], Info, no_export) of
-        {no_export, _} -> 
+        {no_export, _} ->
             throw(no_export);
-        {Arities, _} when is_list(Arities) -> 
+        {Arities, _} when is_list(Arities) ->
             Results = lists:map(fun (A) -> valid_arity(Reg, A) end, Arities),
             case lists:any(fun (ok) -> true; (_) -> false end, Results) of
                 true -> ok;
                 _    -> throw({invalid_entry_arity, Arities})
             end;
-        {Arity, _} when is_integer(Arity) -> 
+        {Arity, _} when is_integer(Arity) ->
             case valid_arity(Reg, Arity) of
                 ok -> ok;
                 _  -> throw({invalid_entry_arity, Arity})
@@ -217,11 +217,11 @@ valid_arity(none, 1)      -> ok;
 valid_arity(_, _)         -> error.
 
 %% @private
-valid_name(local, Name) when is_atom(Name) -> 
+valid_name(local, Name) when is_atom(Name) ->
     ok;
-valid_name(local, Other) -> 
+valid_name(local, Other) ->
     throw({invalid_local_name, Other});
-valid_name(_, _) -> 
+valid_name(_, _) ->
     ok.
 
 %% Tests
@@ -230,13 +230,13 @@ valid_name(_, _) ->
 -include_lib("eunit/include/eunit.hrl").
 -compile([export_all]).
 
-start(_Opts, _, _) -> 
+start(_Opts, _, _) ->
     ok.
 
-start_link(_Opts) -> 
+start_link(_Opts) ->
     ok.
 
-start_link(_Name, _Opts) -> 
+start_link(_Name, _Opts) ->
     ok.
 
 spec_test() ->
